@@ -12,16 +12,63 @@ import FileUpload from '@/components/file-upload';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { addWorkstation, FileAttachment, engineTypes } from '@/lib/data';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function NewWorkstationPage() {
+function PageSkeleton() {
+  return (
+    <div className="flex flex-col h-full">
+      <PageHeader title="Créer un nouveau poste de travail">
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-48" />
+        </div>
+      </PageHeader>
+      <main className="flex-1 p-4 md:p-6 space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle><Skeleton className="h-6 w-1/3" /></CardTitle>
+            <CardDescription><Skeleton className="h-4 w-2/3" /></CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-1/4" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-1/4" />
+              <Skeleton className="h-24 w-full" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle><Skeleton className="h-6 w-1/4" /></CardTitle>
+            <CardDescription><Skeleton className="h-4 w-3/4" /></CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Skeleton className="h-32 w-full" />
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}
+
+function NewWorkstationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [name, setName] = useState('');
@@ -159,4 +206,12 @@ export default function NewWorkstationPage() {
       </main>
     </form>
   );
+}
+
+export default function NewWorkstationPage() {
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <NewWorkstationPageContent />
+    </Suspense>
+  )
 }

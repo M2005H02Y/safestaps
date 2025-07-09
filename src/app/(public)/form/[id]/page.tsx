@@ -6,11 +6,12 @@ import { getFormById, Form } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { File as FileIcon, FileText as FileTextIcon, Download, ImageIcon, FileSpreadsheet, ExternalLink } from 'lucide-react';
-import logo from '@/assets/Logo.jpg';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import ImprovedFillableTable from '@/components/improved-fillable-table';
 import { Skeleton } from '@/components/ui/skeleton';
+
+const logoUrl = 'https://i.postimg.cc/nzSLBHck/Logo.png';
 
 function ReadOnlyTable({ tableData }: { tableData: Form['table_data'] }) {
     if (!tableData || !tableData.rows || !tableData.cols) {
@@ -133,9 +134,9 @@ export default function FormPublicPage() {
                 <main className="w-full max-w-4xl mx-auto space-y-6">
                     <div className="text-center">
                         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-md p-2">
-                            <Image src={logo} alt="SafeSteps Logo" className="h-full w-full object-contain" />
+                            <Image src={logoUrl} alt="WorkHub Central Logo" width={80} height={80} className="h-full w-full object-contain" />
                         </div>
-                        <h1 className="text-3xl font-bold text-slate-900">SafeSteps</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">WorkHub Central</h1>
                     </div>
 
                     <Card>

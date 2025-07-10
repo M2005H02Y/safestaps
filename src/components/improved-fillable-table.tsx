@@ -199,7 +199,7 @@ export default function ImprovedFillableTable({ formName, tableData, isOpen, onC
           <DialogTitle>Remplir le formulaire: {formName}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="flex-grow pr-6">
-          <div className={`grid gap-4`} style={{ gridTemplateColumns: `repeat(${tableData.cols}, 1fr)` }}>
+          <div id="printable-table-container-for-fill" className="p-4 bg-white grid gap-4" style={{ gridTemplateColumns: `repeat(${tableData.cols}, 1fr)` }}>
             {Array.from({ length: tableData.rows }).map((_, r) =>
               Array.from({ length: tableData.cols }).map((_, c) => {
                 const key = getCellKey(r, c);
@@ -209,16 +209,15 @@ export default function ImprovedFillableTable({ formName, tableData, isOpen, onC
                 return (
                   <div 
                     key={key} 
-                    className="flex flex-col gap-2 p-2 border rounded-md"
+                    className="flex flex-col gap-2 p-3 border rounded-lg bg-slate-50"
                     style={{ gridColumn: `span ${cellData?.colspan || 1}`, gridRow: `span ${cellData?.rowspan || 1}` }}
                   >
-                    <Label className="text-sm font-medium text-slate-700">{tableData.headers?.[c] || `Colonne ${c+1}`}</Label>
-                    {cellData?.content && <p className="text-xs text-slate-500 bg-slate-50 p-2 rounded-md">{cellData.content}</p>}
+                    <Label className="text-sm font-medium text-slate-800">{cellData?.content || (tableData.headers?.[c] || `Colonne ${c+1}`)}</Label>
                     <Textarea
                       placeholder="Votre réponse..."
                       value={filledData[key] || ''}
                       onChange={(e) => handleInputChange(key, e.target.value)}
-                      className="h-24"
+                      className="h-24 bg-white"
                     />
                   </div>
                 );

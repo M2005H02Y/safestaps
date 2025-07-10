@@ -9,7 +9,7 @@ import JSZip from 'jszip';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { TableData } from '@/lib/data';
+import { TableData, logAnalyticsEvent } from '@/lib/data';
 import { ScrollArea } from './ui/scroll-area';
 import { Download, Loader2, FileArchive } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -20,11 +20,12 @@ interface ImprovedFillableTableProps {
   tableData?: TableData;
   isOpen: boolean;
   onClose: () => void;
+  formId: string;
 }
 
 const getCellKey = (row: number, col: number) => `${row}-${col}`;
 
-export default function ImprovedFillableTable({ formName, tableData, isOpen, onClose }: ImprovedFillableTableProps) {
+export default function ImprovedFillableTable({ formName, tableData, isOpen, onClose, formId }: ImprovedFillableTableProps) {
   const { toast } = useToast();
   const [filledData, setFilledData] = useState<Record<string, string>>({});
   const [zipBlobUrl, setZipBlobUrl] = useState<string | null>(null);
@@ -148,7 +149,11 @@ export default function ImprovedFillableTable({ formName, tableData, isOpen, onC
 
   const handleGenerateZip = async () => {
     setIsGenerating(true);
-    setZipBlobUrl(null); // Revoke old URL if it exists
+    // Revoke any existing blob URL to prevent memory leaks
+    if (zipBlobUrl) {
+      URL.revokeObjectURL(zipBlobUrl);
+    }
+    setZipBlobUrl(null);
     toast({ title: "Préparation des fichiers...", description: "Veuillez patienter pendant la génération du PDF et de l'Excel." });
 
     const pdfBlob = await generatePdfBlob();
@@ -169,6 +174,14 @@ export default function ImprovedFillableTable({ formName, tableData, isOpen, onC
         const zipBlob = await zip.generateAsync({ type: "blob" });
         setZipBlobUrl(URL.createObjectURL(zipBlob));
         toast({ title: "Fichiers prêts !", description: "Vous pouvez maintenant télécharger le fichier ZIP." });
+        
+        // Log the "form_filled" event
+        logAnalyticsEvent({
+            event_type: 'form_filled',
+            target_type: 'form',
+            target_id: formId,
+        });
+
     } catch (e) {
         console.error("ZIP generation failed:", e);
         toast({ title: "Erreur ZIP", description: "La création du fichier ZIP a échoué.", variant: "destructive"});

@@ -2,7 +2,7 @@
 'use client';
 
 import { notFound, useParams } from 'next/navigation';
-import { getFormById, Form } from '@/lib/data';
+import { getFormById, Form, logAnalyticsEvent } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import Image from 'next/image';
 import { File as FileIcon, FileText as FileTextIcon, Download, ImageIcon, FileSpreadsheet, ExternalLink } from 'lucide-react';
@@ -105,6 +105,12 @@ export default function FormPublicPage() {
                     const f = await getFormById(id);
                     if (f) {
                         setForm(f);
+                        // Fire-and-forget logging
+                        logAnalyticsEvent({
+                            event_type: 'consultation',
+                            target_type: 'form',
+                            target_id: f.id,
+                        });
                     }
                 } catch(e) {
                     console.error("Failed to fetch form", e);
@@ -210,6 +216,7 @@ export default function FormPublicPage() {
                     tableData={form.table_data}
                     isOpen={isFillModalOpen}
                     onClose={() => setIsFillModalOpen(false)}
+                    formId={form.id}
                 />
             )}
         </>

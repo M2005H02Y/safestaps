@@ -1,6 +1,6 @@
 
 import { notFound } from 'next/navigation';
-import { getWorkstationById, Workstation } from '@/lib/data';
+import { getWorkstationById, Workstation, logAnalyticsEvent } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Image from 'next/image';
 import { File as FileIcon, FileText as FileTextIcon, Download, ImageIcon, FileSpreadsheet } from 'lucide-react';
@@ -10,7 +10,15 @@ import OcpLogo from '@/app/ocplogo.png';
 async function WorkstationPublicPage({ params }: { params: { id: string } }) {
   const workstation = await getWorkstationById(params.id);
 
-  if (!workstation) {
+  if (workstation) {
+    // Fire-and-forget logging
+    logAnalyticsEvent({
+        event_type: 'consultation',
+        target_type: 'workstation',
+        target_id: workstation.id,
+        target_details: { type: workstation.type }
+    });
+  } else {
     notFound();
   }
 

@@ -1,6 +1,6 @@
 
 import { notFound } from 'next/navigation';
-import { getStandardById, Standard } from '@/lib/data';
+import { getStandardById, logAnalyticsEvent, Standard } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Image from 'next/image';
 import { File as FileIcon, FileText as FileTextIcon, Download, ImageIcon, FileSpreadsheet } from 'lucide-react';
@@ -10,7 +10,14 @@ import OcpLogo from '@/app/ocplogo.png';
 async function StandardPublicPage({ params }: { params: { id: string } }) {
   const standard = await getStandardById(params.id);
 
-  if (!standard) {
+  if (standard) {
+    // Fire-and-forget logging
+    logAnalyticsEvent({
+        event_type: 'consultation',
+        target_type: 'standard',
+        target_id: standard.id,
+    });
+  } else {
     notFound();
   }
 

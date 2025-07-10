@@ -215,6 +215,7 @@ export default function FormDetailPage() {
             tableData={form.table_data}
             isOpen={isFillModalOpen}
             onClose={() => setIsFillModalOpen(false)}
+            formId={id}
         />
     )}
     </>

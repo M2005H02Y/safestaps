@@ -58,12 +58,33 @@ export type Form = {
   files?: FileAttachment[];
 };
 
+// --- Analytics Types ---
+export type AnalyticsEvent = {
+    id?: number;
+    created_at?: string;
+    event_type: 'consultation' | 'form_filled';
+    target_type: 'workstation' | 'standard' | 'form';
+    target_id: string;
+    target_details?: object;
+};
+
 export const getFileType = (file: File): FileAttachment['type'] => {
     if (file.type.startsWith('image/')) return 'image';
     if (file.type === 'application/pdf') return 'pdf';
     if (file.type.includes('spreadsheet') || file.type.includes('excel') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) return 'excel';
     return 'other';
 }
+
+// --- Analytics Functions ---
+export async function logAnalyticsEvent(event: AnalyticsEvent): Promise<boolean> {
+    const { error } = await supabase.from('analytics_events').insert([event]);
+    if (error) {
+        console.error("Error logging analytics event:", error);
+        return false;
+    }
+    return true;
+}
+
 
 // --- Workstation Functions ---
 export async function getWorkstations(): Promise<Workstation[]> {

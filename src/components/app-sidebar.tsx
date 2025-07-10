@@ -15,6 +15,7 @@ import {
   SidebarGroupLabel,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import OcpLogo from '@/app/ocplogo.png';
 
 const menuItems = [
   { href: "/dashboard", label: "Dashboard", subLabel: "Vue d'ensemble", icon: LayoutGrid },
@@ -23,7 +24,6 @@ const menuItems = [
   { href: "/forms", label: "Formulaires", subLabel: "Formulaires configurables", icon: File },
 ];
 
-const logoUrl = 'https://i.postimg.cc/nzSLBHck/Logo.png';
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -34,11 +34,11 @@ export default function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2.5">
            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white p-1">
-            <Image src={logoUrl} alt="WorkHub Central Logo" width={32} height={32} className="h-full w-full object-contain" />
+            <Image src={OcpLogo} alt="SafeSteps Logo" width={32} height={32} className="h-full w-full object-contain" />
           </div>
           {state === 'expanded' && (
             <div className="flex flex-col">
-              <h1 className="text-base font-semibold text-white">WorkHub Central</h1>
+              <h1 className="text-base font-semibold text-white">SafeSteps</h1>
               <p className="text-xs text-sidebar-foreground">Procédures & Sécurité</p>
             </div>
           )}

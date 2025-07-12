@@ -207,30 +207,27 @@ export default function DashboardPage() {
     setIsExportingPdf(true);
     toast({ title: "Génération du PDF...", description: "Veuillez patienter, cela peut prendre un moment." });
 
-    const chartContainers = analyticsSection.querySelectorAll<HTMLElement>('.pdf-chart-grid');
-    const originalStyles: { element: HTMLElement, display: string, gridTemplateColumns: string }[] = [];
-
-    const originalSectionDisplay = analyticsSection.style.display;
-    analyticsSection.style.display = 'block';
-
-    chartContainers.forEach(container => {
-        originalStyles.push({ element: container, display: container.style.display, gridTemplateColumns: container.style.gridTemplateColumns });
-        container.style.display = 'flex';
-        container.style.flexWrap = 'wrap';
-        container.style.gap = '1rem';
-        Array.from(container.children).forEach(child => {
-            (child as HTMLElement).style.flex = '1 1 calc(50% - 1rem)';
-            (child as HTMLElement).style.minWidth = 'calc(50% - 1rem)';
-        });
-    });
-
+    // Cacher les éléments non désirés
+    const elementsToHide = analyticsSection.querySelectorAll('.pdf-hide');
+    elementsToHide.forEach(el => (el as HTMLElement).style.display = 'none');
+    
     try {
         const canvas = await html2canvas(analyticsSection, {
             scale: 2,
             useCORS: true,
-            backgroundColor: null,
-            windowWidth: 1200,
-            windowHeight: analyticsSection.scrollHeight,
+            backgroundColor: null, // Transparent background
+            onclone: (document) => {
+              // Appliquer des styles spécifiques pour l'impression dans le document cloné
+              const clonedSection = document.getElementById('analytics-section');
+              if (clonedSection) {
+                clonedSection.style.backgroundColor = 'white';
+                clonedSection.querySelectorAll<HTMLElement>('.pdf-chart-grid').forEach(container => {
+                  container.style.display = 'grid';
+                  container.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                  container.style.gap = '16px';
+                });
+              }
+            }
         });
         
         const imgData = canvas.toDataURL('image/png');
@@ -253,15 +250,8 @@ export default function DashboardPage() {
         toast({ title: "Erreur d'exportation PDF", description: "La génération du fichier a échoué.", variant: "destructive" });
     } finally {
         setIsExportingPdf(false);
-        analyticsSection.style.display = originalSectionDisplay;
-        originalStyles.forEach(({ element, display, gridTemplateColumns }) => {
-            element.style.display = display;
-            element.style.gridTemplateColumns = gridTemplateColumns;
-            Array.from(element.children).forEach(child => {
-              (child as HTMLElement).style.flex = '';
-              (child as HTMLElement).style.minWidth = '';
-            });
-        });
+        // Rétablir l'affichage des éléments cachés
+        elementsToHide.forEach(el => (el as HTMLElement).style.display = '');
     }
   };
 
@@ -343,7 +333,7 @@ export default function DashboardPage() {
             <Button 
                 onClick={handleExportExcel} 
                 disabled={loadingAnalytics || isExportingExcel || isExportingPdf} 
-                className="bg-green-600 text-white hover:bg-green-700"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {isExportingExcel ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileDown className="mr-2 h-4 w-4" />}
               {isExportingExcel ? "Génération..." : "Exporter en Excel"}
@@ -351,7 +341,7 @@ export default function DashboardPage() {
             <Button 
                 onClick={handleExportPdf} 
                 disabled={loadingAnalytics || isExportingExcel || isExportingPdf} 
-                className="bg-red-600 text-white hover:bg-red-700"
+                variant="destructive"
             >
               {isExportingPdf ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <FileDown className="mr-2 h-4 w-4" />}
               {isExportingPdf ? "Génération..." : "Exporter en PDF"}
@@ -388,7 +378,7 @@ export default function DashboardPage() {
         <div id="analytics-section" className="space-y-4 p-4 rounded-lg bg-background/50">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <h2 className="text-2xl font-bold text-slate-900">Analyse d'Activité</h2>
-                <Tabs defaultValue={timeRange.toString()} onValueChange={(value) => setTimeRange(parseInt(value))}>
+                <Tabs defaultValue={timeRange.toString()} onValueChange={(value) => setTimeRange(parseInt(value))} className="pdf-hide">
                     <TabsList>
                         <TabsTrigger value="7">7 jours</TabsTrigger>
                         <TabsTrigger value="30">30 jours</TabsTrigger>
